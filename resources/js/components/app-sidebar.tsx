@@ -15,7 +15,7 @@ const mainNavItems: NavItem[] = [
     },
     {
         title: 'Search',
-        href: '/search',
+        href: '/get',
         icon: Search,
     },
 ];

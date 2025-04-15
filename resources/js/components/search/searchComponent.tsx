@@ -6,9 +6,10 @@ interface SearchResult {
   judul_indonesia: string;
   judul_inggris: string;
   penulis: string;
-  nim: string;
   fakultas: string;
-  kata_kunci: string[];
+  nim: string;
+  kata_kunci: string;
+  score: string;
 }
 
 const SearchComponent = () => {
@@ -20,46 +21,6 @@ const SearchComponent = () => {
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
   const suggestionsRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-
-  // Sample data for demonstration (in practice, this would come from your API)
-  const sampleData: SearchResult[] = [
-    {
-      url: "https://digilib.unesa.ac.id/detail/OThiM2VkYjAtNTk0OS0xMWViLWI3OGMtODU3ZTZhNTNlYjVj",
-      judul_indonesia: "Sistem Informasi Rekomendasi Penjadwalan Sidang Skripsi Dengan Metode Depth First Search Pada Jurusan Teknik Informatika Universitas Negeri Surabaya",
-      judul_inggris: "Information System for Recommended Thesis Jugdement Schedule at Computer Science Department State University of Surabaya",
-      penulis: "EDTALIA SANTI NURJANAH",
-      nim: "16051214011",
-      fakultas: "Fak. Teknik",
-      kata_kunci: ["teknik informatika", "penjadwalan", "depth first search"]
-    },
-    {
-      url: "https://digilib.unesa.ac.id/detail/Y2NmYTI5YTAtOThiNy0xMWU5LWE2ZWMtOWRjYzM0N2MwYWRk",
-      judul_indonesia: "PENGEMBANGAN WEB REPOSITORI UNTUK MENINGKATKAN PENGETAHUAN KOGNITIF TENTANG METODE PENELITIAN PADA MAHASISWA DI JURUSAN TEKNIK INFORMATIKA UNIVERSITAS NEGERI SURABAYA",
-      judul_inggris: "DEVELOPMENT OF WEB REPOSITORY TO IMPROVE COGNITIVE KNOWLEDGE ABOUT RESEARCH METHODS IN STUDENTS IN INFORMATICS ENGINEERING DEPARTMENT OF UNIVERSITAS NEGERI SURABAYA",
-      penulis: "RIFANI PUJI RAHMAWATI",
-      nim: "16050974041",
-      fakultas: "Fak. Teknik",
-      kata_kunci: ["teknik informatika", "web repositori", "metode penelitian"]
-    },
-    {
-      url: "https://digilib.unesa.ac.id/detail/sample-url-3",
-      judul_indonesia: "Analisis Performa Algoritma Machine Learning pada Klasifikasi Dokumen",
-      judul_inggris: "Performance Analysis of Machine Learning Algorithms for Document Classification",
-      penulis: "AHMAD WIDODO",
-      nim: "17050974099",
-      fakultas: "Fak. Teknik",
-      kata_kunci: ["machine learning", "klasifikasi", "analisis performa"]
-    },
-    {
-      url: "https://digilib.unesa.ac.id/detail/sample-url-4",
-      judul_indonesia: "Pengembangan Aplikasi Mobile untuk Monitoring Aktivitas Mahasiswa",
-      judul_inggris: "Mobile Application Development for Student Activity Monitoring",
-      penulis: "SITI NURHALIZA",
-      nim: "18050974123",
-      fakultas: "Fak. Teknik",
-      kata_kunci: ["mobile", "monitoring", "aplikasi"]
-    }
-  ];
 
   // Popular search terms for suggestions
   const popularSearchTerms = [
@@ -101,14 +62,7 @@ const SearchComponent = () => {
   // Generate suggestions based on input
   useEffect(() => {
     if (searchQuery.length > 1) {
-      // Filter from popular terms and sample data
-      const titleSuggestions = sampleData
-        .filter(item => 
-          item.judul_indonesia.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          item.judul_inggris.toLowerCase().includes(searchQuery.toLowerCase())
-        )
-        .map(item => item.judul_indonesia.substring(0, 60) + (item.judul_indonesia.length > 60 ? '...' : ''));
-
+      // Filter from popular terms
       const termSuggestions = popularSearchTerms.filter(term => 
         term.toLowerCase().includes(searchQuery.toLowerCase())
       );
@@ -118,16 +72,16 @@ const SearchComponent = () => {
       );
 
       // Combine and remove duplicates
-      const allSuggestions = [...new Set([...recentSuggestions, ...termSuggestions, ...titleSuggestions])].slice(0, 5);
+      const allSuggestions = [...new Set([...recentSuggestions, ...termSuggestions])].slice(0, 5);
       setSuggestions(allSuggestions);
       setShowSuggestions(allSuggestions.length > 0);
     } else {
       setSuggestions([]);
       setShowSuggestions(false);
     }
-  }, [searchQuery, recentSearches]);
-
-  const handleSearch = (e: React.FormEvent<HTMLFormElement> | null, query = searchQuery) => {
+  }, [searchQuery, recentSearches, popularSearchTerms]);
+  
+  const handleSearch = async (e: React.FormEvent<HTMLFormElement> | null, query = searchQuery) => {
     if (e) e.preventDefault();
     if (!query.trim()) return;
     
@@ -141,19 +95,23 @@ const SearchComponent = () => {
       localStorage.setItem('recentSearches', JSON.stringify(newRecentSearches));
     }
     
-    // Simulate API delay
-    setTimeout(() => {
-      // Filter results based on search query
-      const results = sampleData.filter(item => 
-        item.judul_indonesia.toLowerCase().includes(query.toLowerCase()) ||
-        item.judul_inggris.toLowerCase().includes(query.toLowerCase()) ||
-        item.penulis.toLowerCase().includes(query.toLowerCase()) ||
-        item.kata_kunci.some(keyword => keyword.toLowerCase().includes(query.toLowerCase()))
-      );
+    try {
+      // Make actual API call to the Laravel backend
+      const rank = 0; // Default rank value
+      const response = await fetch(`/search?q=${encodeURIComponent(query)}&rank=${rank}`);
       
-      setSearchResults(results);
+      if (!response.ok) {
+        throw new Error('Search request failed');
+      }
+      
+      const data = await response.json();
+      setSearchResults(data);
+    } catch (error) {
+      console.error('Error performing search:', error);
+      setSearchResults([]);
+    } finally {
       setIsLoading(false);
-    }, 500);
+    }
   };
 
   const handleSuggestionClick = (suggestion: string) => {
@@ -185,9 +143,14 @@ const SearchComponent = () => {
       return domain;
     } catch {
       console.error("Invalid URL:", url);
-      
       return url;
     }
+  };
+  
+  // Function to get keywords as array (since they come as string from backend)
+  const getKeywordsArray = (keywordsString: string): string[] => {
+    if (!keywordsString) return [];
+    return keywordsString.split(',').map(keyword => keyword.trim());
   };
   
   return (
@@ -214,10 +177,9 @@ const SearchComponent = () => {
               {searchQuery && (
                 <button
                   type="button"
+                  aria-label="Clear search"
                   onClick={handleClearSearch}
                   className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
-                  title="Clear search"
-                  aria-label="Clear search"
                 >
                   <X className="h-5 w-5" />
                 </button>
@@ -323,14 +285,19 @@ const SearchComponent = () => {
                     {searchResults.map((result, index) => (
                       <div key={index} className="p-4 hover:bg-blue-50 transition duration-150">
                         <div className="flex flex-col">
-                          <a 
-                            href={result.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-sm text-gray-500 hover:underline mb-1 flex items-center"
-                          >
-                            {extractDomain(result.url)}
-                          </a>
+                          <div className="flex justify-between items-start">
+                            <a 
+                              href={result.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-sm text-gray-500 hover:underline mb-1 flex items-center"
+                            >
+                              {extractDomain(result.url)}
+                            </a>
+                            <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded font-medium">
+                              Score: {parseFloat(result.score).toFixed(2)}
+                            </span>
+                          </div>
                           
                           <a 
                             href={result.url}
@@ -350,7 +317,7 @@ const SearchComponent = () => {
                           </p>
                           
                           <div className="mt-1 flex flex-wrap gap-2">
-                            {result.kata_kunci.map((keyword, kIdx) => (
+                            {getKeywordsArray(result.kata_kunci).map((keyword, kIdx) => (
                               <span 
                                 key={kIdx} 
                                 className="bg-blue-50 text-blue-700 px-2 py-1 rounded text-xs cursor-pointer hover:bg-blue-100"

@@ -1,17 +1,18 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Search;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Symfony\Component\Process\Process;
-use Symfony\Component\Process\Exception\ProcessFailedException;
+
 
 class SearchController extends Controller
 {
     public function search(Request $request)
     {
         $query = $request->input('q', '');
-        $rank = $request->input('rank', 1000);
+        $rank = $request->input('rank', 0);
     
         $process = new Process(["python3", "query.py", "indexdb", (string) $rank, $query]);
         $process->run();

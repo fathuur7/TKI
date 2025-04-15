@@ -7,7 +7,7 @@ import { Head } from '@inertiajs/react';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Search',
-        href: '/search',
+        href: '/get',
     },
 ];
 
