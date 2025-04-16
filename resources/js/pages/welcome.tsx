@@ -54,7 +54,7 @@ export default function Welcome() {
                             </div>
                             <h1 className="mb-4 text-5xl font-bold tracking-tight">SkripsiKu</h1>
                             <p className="mx-auto mb-8 max-w-lg text-xl text-gray-600 dark:text-gray-300">
-                                Selamat datang di portal referensi skripsi terlengkap untuk mahasiswa Indonesia
+                                Selamat datang di portal referensi skripsi terlengkap untuk mahasiswa Unesa
                             </p>
 
                             <div className="flex flex-col items-center justify-center space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">
@@ -96,7 +96,7 @@ export default function Welcome() {
                                         </svg>
                                     </div>
                                     <h3 className="mb-2 text-lg font-medium">Koleksi Lengkap</h3>
-                                    <p className="text-gray-500 dark:text-gray-400">Ribuan skripsi dari berbagai universitas di Indonesia</p>
+                                    <p className="text-gray-500 dark:text-gray-400">Ribuan skripsi dari Universitas Unesa</p>
                                 </div>
                                 <div className="rounded-lg border border-gray-200 bg-white p-6 text-center shadow-sm dark:border-gray-700 dark:bg-gray-800">
                                     <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900">
@@ -115,10 +115,6 @@ export default function Welcome() {
                             <div className="rounded-lg border border-gray-200 bg-white p-6 text-center shadow-sm dark:border-gray-700 dark:bg-gray-800">
                                 <div className="mb-3 text-4xl font-bold text-blue-600 dark:text-blue-400">5,000+</div>
                                 <div className="text-gray-600 dark:text-gray-300">Skripsi</div>
-                            </div>
-                            <div className="rounded-lg border border-gray-200 bg-white p-6 text-center shadow-sm dark:border-gray-700 dark:bg-gray-800">
-                                <div className="mb-3 text-4xl font-bold text-blue-600 dark:text-blue-400">50+</div>
-                                <div className="text-gray-600 dark:text-gray-300">Universitas</div>
                             </div>
                             <div className="rounded-lg border border-gray-200 bg-white p-6 text-center shadow-sm dark:border-gray-700 dark:bg-gray-800">
                             <div className="mb-3 text-4xl font-bold text-blue-600 dark:text-blue-400">

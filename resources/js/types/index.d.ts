@@ -5,6 +5,8 @@ export interface Auth {
     user: User;
 }
 
+
+
 export interface BreadcrumbItem {
     title: string;
     href: string;
@@ -29,6 +31,7 @@ export interface SharedData {
     ziggy: Config & { location: string };
     sidebarOpen: boolean;
     [key: string]: unknown;
+    
 }
 
 export interface User {
