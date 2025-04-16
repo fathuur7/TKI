@@ -24,65 +24,6 @@ class SearchController extends Controller
         return $this->formatResults($process->getOutput());
     }
     
-    public function advancedSearch(Request $request)
-    {
-        $judul = $request->input('judul', '');
-        $penulis = $request->input('penulis', '');
-        $fakultas = $request->input('fakultas', '');
-        
-        // Remove "Fak. " prefix if present for search purposes
-        $fakultasSearch = $fakultas;
-        if (strpos($fakultas, 'Fak. ') === 0) {
-            $fakultasSearch = substr($fakultas, 5);
-        }
-        
-        // Build combined search query for the Python script
-        $searchParts = [];
-        if (!empty($judul)) $searchParts[] = $judul;
-        if (!empty($penulis)) $searchParts[] = $penulis;
-        if (!empty($fakultasSearch) && $fakultas !== '- Pilih -') $searchParts[] = $fakultasSearch;
-        
-        $combinedQuery = implode(' ', $searchParts);
-        
-        // If no search parameters, return empty results
-        if (empty($combinedQuery)) {
-            return response()->json([]);
-        }
-        
-        // Call the Python script
-        $process = new Process(["python3", "query.py", "indexdb", "0", $combinedQuery]);
-        $process->run();
-        
-        if (!$process->isSuccessful()) {
-            return response()->json(['error' => 'Process failed'], 500);
-        }
-        
-        // Get the raw results
-        $results = $this->formatResults($process->getOutput());
-        
-        // Filter results based on exact matching conditions
-        $filteredResults = $results->original;
-        
-        if (!empty($judul)) {
-            $filteredResults = array_filter($filteredResults, function($item) use ($judul) {
-                return stripos($item['judul_indonesia'], $judul) !== false;
-            });
-        }
-        
-        if (!empty($penulis)) {
-            $filteredResults = array_filter($filteredResults, function($item) use ($penulis) {
-                return stripos($item['penulis'], $penulis) !== false;
-            });
-        }
-        
-        if (!empty($fakultas) && $fakultas !== '- Pilih -') {
-            $filteredResults = array_filter($filteredResults, function($item) use ($fakultas) {
-                return $item['fakultas'] == $fakultas;
-            });
-        }
-        
-        return response()->json(array_values($filteredResults));
-    }
     
     private function formatResults($rawOutput)
     {
