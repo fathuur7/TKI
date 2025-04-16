@@ -79,7 +79,7 @@ const extractDomain = (url: string): string => {
                   {extractDomain(result.url)}
                 </a>
                 <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded font-medium">
-                  Score: {parseFloat(result.score).toFixed(2)}
+                  Score: {parseFloat(result.score.toString()).toFixed(2)}
                 </span>
               </div>
               
