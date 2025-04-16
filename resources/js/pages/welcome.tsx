@@ -3,7 +3,6 @@ import { Head, Link, usePage } from '@inertiajs/react';
 
 export default function Welcome() {
     const { auth  } = usePage<SharedData>().props;
-    const userCount = usePage().props.userCount || 0;
     
     return (
         <>
@@ -107,20 +106,6 @@ export default function Welcome() {
                                     <h3 className="mb-2 text-lg font-medium">Akses Terjamin</h3>
                                     <p className="text-gray-500 dark:text-gray-400">Dokumen asli dengan sumber yang terpercaya</p>
                                 </div>
-                            </div>
-                        </div>
-
-                        {/* Statistics Section */}
-                        <div className="mt-16 grid grid-cols-1 gap-6 md:grid-cols-3">
-                            <div className="rounded-lg border border-gray-200 bg-white p-6 text-center shadow-sm dark:border-gray-700 dark:bg-gray-800">
-                                <div className="mb-3 text-4xl font-bold text-blue-600 dark:text-blue-400">5,000+</div>
-                                <div className="text-gray-600 dark:text-gray-300">Skripsi</div>
-                            </div>
-                            <div className="rounded-lg border border-gray-200 bg-white p-6 text-center shadow-sm dark:border-gray-700 dark:bg-gray-800">
-                            <div className="mb-3 text-4xl font-bold text-blue-600 dark:text-blue-400">
-                                {String(userCount)}
-                            </div>
-                            <div className="text-gray-600 dark:text-gray-300">Pengguna</div>
                             </div>
                         </div>
                     </div>
